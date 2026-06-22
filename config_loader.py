@@ -8,6 +8,7 @@ class Config:
         self.EXIT = (0, 0)
         self.OUTPUT_FILE = ""
         self.PERFECT = False
+        self.SEED = None
         self._load(filename)
         self.validate_data()
 
@@ -34,6 +35,9 @@ class Config:
                     self.OUTPUT_FILE = value
                 elif key == "PERFECT":
                     self.PERFECT = value.lower() == "true"
+                elif key == "SEED":
+                    self.SEED = int(value)
+
 
     def validate_data(self):
         if self.WIDTH <= 0 or self.HEIGHT <= 0:
