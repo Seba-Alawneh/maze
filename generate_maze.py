@@ -9,6 +9,8 @@ class Cell:
         self.south = True
         self.west = True
         self.visited = False
+    #def get_hex(self):
+
 
 class MazeGenerator:
     def __init__(self, config: Config):
@@ -20,7 +22,7 @@ class MazeGenerator:
         random.seed(config.SEED)
 
     
-    def grid_gen(self):
+    def grid_gen(self) -> list[Cell]:
         main_grid = []
         for y in range(self.height):
             row = []
@@ -69,7 +71,31 @@ class MazeGenerator:
         elif dy == -1:
             current.south = False
             next.north = False
-        
+    
+    def imperfect_maze(self):
+        extra_wall = int((self.width * self.height) * 0.05)
+        for _ in range(extra_wall):
+            x = random.randint(1, self.width - 1)
+            y = random.randint(1, self.height - 1)
+            current_cell = self.grid[y][x]
+            top = self.check_cell(x, y - 1)
+            bottom = self.check_cell(x, y + 1)
+            left = self.check_cell(x - 1, y)
+            right = self.check_cell(x + 1, y)
+            neighbors = []
+            if top:
+                neighbors.append(top)
+            if bottom:
+                neighbors.append(bottom)
+            if left:
+                neighbors.append(left)
+            if right:
+                neighbors.append(right)
+            if neighbors:
+                random_neighbor = random.choice(neighbors)
+                self.remove_wall(current_cell, random_neighbor)
+
+
     def generate_maze(self):
         entry_point = self.grid[self.entry[1]][self.entry[0]]
         stack = []
@@ -86,3 +112,5 @@ class MazeGenerator:
                 current_cell = next_cell
             else:
                 current_cell = stack.pop()
+    #def export_maze(self): هاذ عشان الاوتبوت فايل
+    
