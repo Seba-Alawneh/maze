@@ -1,52 +1,54 @@
-from config_loader import Config
 import random
+from typing import Union
+from config_loader import Config
+
+
 class Cell:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.north = True
-        self.east = True
-        self.south = True
-        self.west = True
-        self.visited = False
-    #def get_hex(self):
+    def __init__(self, x: int, y: int) -> None:
+        self.x: int = x
+        self.y: int = y
+        self.north: bool = True
+        self.east: bool = True
+        self.south: bool = True
+        self.west: bool = True
+        self.visited: bool = False
+    # def get_hex(self) -> str:
 
 
 class MazeGenerator:
-    def __init__(self, config: Config):
-        self.width = config.WIDTH
-        self.height = config.HEIGHT
-        self.entry = config.ENTRY
-        self.exit = config.EXIT
-        self.grid =  self.grid_gen()
+    def __init__(self, config: Config) -> None:
+        self.width: int = config.WIDTH
+        self.height: int = config.HEIGHT
+        self.entry: tuple = config.ENTRY
+        self.exit: tuple = config.EXIT
+        self.perfect: bool = config.PERFECT
+        self.grid: list[list[Cell]] = self.grid_gen()
         random.seed(config.SEED)
 
-    
-    def grid_gen(self) -> list[Cell]:
-        main_grid = []
+    def grid_gen(self) -> list[list[Cell]]:
+        main_grid: list[list[Cell]] = []
         for y in range(self.height):
-            row = []
+            row: list[Cell] = []
             for x in range(self.width):
                 row.append(Cell(x, y))
             main_grid.append(row)
         return main_grid
-    
-    def check_cell(self, x, y):
-        if x >= self.width or x<0 or y>= self.height or y<0:
+
+    def check_cell(self, x: int, y: int) -> Union[Cell, bool]:
+        if x >= self.width or x < 0 or y >= self.height or y < 0:
             return False
         return self.grid[y][x]
-    
-    def get_unvisited_neighbors(self, cell: Cell):
-        neighbors = []
-        x = cell.x
-        y = cell.y
 
-        
-        top = self.check_cell(x, y-1)
-        left = self.check_cell(x-1, y)
-        right = self.check_cell(x+1, y)
-        bottom = self.check_cell(x, y+1)
-        
+    def get_unvisited_neighbors(self, cell: Cell) -> Union[Cell, bool]:
+        neighbors: list[Cell] = []
+        x: int = cell.x
+        y: int = cell.y
+
+        top = self.check_cell(x, y - 1)
+        left = self.check_cell(x - 1, y)
+        right = self.check_cell(x + 1, y)
+        bottom = self.check_cell(x, y + 1)
+
         if top and not top.visited:
             neighbors.append(top)
         if left and not left.visited:
@@ -55,9 +57,10 @@ class MazeGenerator:
             neighbors.append(bottom)
         if right and not right.visited:
             neighbors.append(right)
+
         return random.choice(neighbors) if neighbors else False
-   
-    def remove_wall(self, current: Cell, next: Cell):
+
+    def remove_wall(self, current: Cell, next: Cell) -> None:
         dx, dy = current.x - next.x, current.y - next.y
         if dx == 1:
             current.west = False
@@ -71,18 +74,20 @@ class MazeGenerator:
         elif dy == -1:
             current.south = False
             next.north = False
-    
-    def imperfect_maze(self):
-        extra_wall = int((self.width * self.height) * 0.05)
+
+    def imperfect_maze(self) -> None:
+        extra_wall: int = int((self.width * self.height) * 0.05)
         for _ in range(extra_wall):
-            x = random.randint(1, self.width - 1)
-            y = random.randint(1, self.height - 1)
-            current_cell = self.grid[y][x]
+            x: int = random.randint(0, self.width - 1)
+            y: int = random.randint(0, self.height - 1)
+            current_cell: Cell = self.grid[y][x]
+
             top = self.check_cell(x, y - 1)
             bottom = self.check_cell(x, y + 1)
             left = self.check_cell(x - 1, y)
             right = self.check_cell(x + 1, y)
-            neighbors = []
+
+            neighbors: list[Cell] = []
             if top:
                 neighbors.append(top)
             if bottom:
@@ -91,18 +96,18 @@ class MazeGenerator:
                 neighbors.append(left)
             if right:
                 neighbors.append(right)
+
             if neighbors:
                 random_neighbor = random.choice(neighbors)
                 self.remove_wall(current_cell, random_neighbor)
 
-
-    def generate_maze(self):
-        entry_point = self.grid[self.entry[1]][self.entry[0]]
-        stack = []
-        current_cell = entry_point
+    def generate_maze(self) -> None:
+        entry_point: Cell = self.grid[self.entry[1]][self.entry[0]]
+        stack: list[Cell] = []
+        current_cell: Cell = entry_point
         current_cell.visited = True
         stack.append(current_cell)
-        
+
         while stack:
             next_cell = self.get_unvisited_neighbors(current_cell)
             if next_cell:
@@ -112,5 +117,9 @@ class MazeGenerator:
                 current_cell = next_cell
             else:
                 current_cell = stack.pop()
-    #def export_maze(self): هاذ عشان الاوتبوت فايل
-    
+
+        if not self.perfect:
+            self.imperfect_maze()
+    # def export_maze(self): هاذ عشان الاوتبوت فايل
+
+
