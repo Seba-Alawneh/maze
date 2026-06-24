@@ -12,7 +12,18 @@ class Cell:
         self.south: bool = True
         self.west: bool = True
         self.visited: bool = False
-    # def get_hex(self) -> str:
+    def get_hex(self) -> str: #.....
+        """Return hex representation of cell walls."""
+        value: int = 0
+        if self.north:
+            value += 1
+        if self.east:
+            value += 2
+        if self.south:
+            value += 4
+        if self.west:
+            value += 8
+        return format(value, 'X')
 
 
 class MazeGenerator:
@@ -22,8 +33,9 @@ class MazeGenerator:
         self.entry: tuple = config.ENTRY
         self.exit: tuple = config.EXIT
         self.perfect: bool = config.PERFECT
+        self.output_file: str = config.OUTPUT_FILE  # ← ناقص هذا!
+        random.seed(config.SEED)                   # 2. الـ random.seed لازم يكون قبل grid_gen عشان الـ seed يأثر على التوليد.
         self.grid: list[list[Cell]] = self.grid_gen()
-        random.seed(config.SEED)
 
     def grid_gen(self) -> list[list[Cell]]:
         main_grid: list[list[Cell]] = []
@@ -120,6 +132,50 @@ class MazeGenerator:
 
         if not self.perfect:
             self.imperfect_maze()
-    # def export_maze(self): هاذ عشان الاوتبوت فايل
+
+    def export_maze(self, solution: str) -> None: #....
+        """Write maze to output file in hex format."""
+        with open(self.output_file, 'w') as f:
+            for row in self.grid:
+                line: str = ''.join(cell.get_hex() for cell in row)
+                f.write(line + '\n')
+            f.write('\n')
+            f.write(f'{self.entry[0]},{self.entry[1]}\n')
+            f.write(f'{self.exit[0]},{self.exit[1]}\n')
+            f.write(solution + '\n')
+
+#if __name__ == "__main__":
+  #  c = Cell(0, 0)
+   # print(c.get_hex())
+
+    #c.south = False
+   # print(c.get_hex())
+
+   # c.north = False
+    #c.east = False
+   # print(c.get_hex())
 
 
+#if __name__ == "__main__":
+   # from maze_solver import MazeSolver
+
+   # config = Config("config.txt")
+   # gen = MazeGenerator(config)
+  #  gen.generate_maze()
+
+    # حوّل الـ grid من Cell objects لأرقام hex
+  #  int_grid = []
+   # for row in gen.grid:
+       # int_row = [int(cell.get_hex(), 16) for cell in row]
+     #   int_grid.append(int_row)
+
+    # شغّل الـ solver
+   # solver = MazeSolver(int_grid, config.ENTRY, config.EXIT)
+   # solver.solve()
+   # solution = solver.get_path_string()
+
+   # print("The real path:", solution)
+  #  print("Number of steps:", len(solution))
+
+   # gen.export_maze(solution)
+  #  print("write in maze txt!")
