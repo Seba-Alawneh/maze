@@ -75,4 +75,3 @@ if __name__ == "__main__":
         print("Number of steps:", len(result))
     else:
         print("What's in the path ")
-        

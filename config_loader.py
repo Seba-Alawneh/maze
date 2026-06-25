@@ -8,37 +8,60 @@ class Config:
         self.EXIT = (0, 0)
         self.OUTPUT_FILE = ""
         self.PERFECT = False
-        self.SEED = 0 #.....
+        self.SEED = 0
         self._load(filename)
         self.validate_data()
-
+    @staticmethod
+    def check_split(parts: list, original_text: str, delimiter: str):
+        if len(parts) != 2:
+            raise ValueError(
+                f"Bad syntax in configuration. Missing '{delimiter}' in: '{original_text.strip()}'"
+            )
     def _load(self, filename: str):
-        with open(filename, "r") as f:
-            for line in f:
-                line = line.strip()
-                if line.startswith("#") or line == "":
-                    continue
-                key, value = line.split("=", 1)
-                key = key.strip()
-                value = value.strip()
-                if key == "WIDTH":
-                    self.WIDTH = int(value)
-                elif key == "HEIGHT":
-                    self.HEIGHT = int(value)
-                elif key == "ENTRY":
-                    x, y = value.split(",")
-                    self.ENTRY = (int(x), int(y))
-                elif key == "EXIT":
-                    x, y = value.split(",")
-                    self.EXIT = (int(x), int(y))
-                elif key == "OUTPUT_FILE":
-                    self.OUTPUT_FILE = value
-                elif key == "PERFECT":
-                    self.PERFECT = value.lower() == "true"
-                elif key == "SEED":
-                    self.SEED = int(value)
-
-
+        seen_keys: set = set()
+        try:
+            with open(filename, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith("#") or line == "":
+                        continue
+                    parts = line.split("=", 1)
+                    Config.check_split(parts, line, "=")
+                    key, value = parts
+                    key = key.strip()
+                    value = value.strip()
+                    if key in seen_keys:
+                        raise ValueError(f"Duplicate key found in configuration: {key}")
+                    seen_keys.add(key)
+                    if key in ["WIDTH", "HEIGHT", "SEED"]:
+                        try:
+                            numeric_value = int(value)
+                            if key == "WIDTH":
+                                self.WIDTH = numeric_value
+                            elif key == "HEIGHT":
+                                self.HEIGHT = numeric_value
+                            elif key == "SEED":
+                                self.SEED = numeric_value
+                        except ValueError:
+                            raise ValueError(f"Invalid configuration: The value for {key} must be a number.")
+                    elif key in ["ENTRY", "EXIT"]:
+                        coords = value.split(",")
+                        Config.check_split(coords, value, ",")
+                        try:
+                            x, y = int(coords[0].strip()), int(coords[1].strip())
+                            if key == "ENTRY":
+                                self.ENTRY = (x, y)
+                            elif key == "EXIT":
+                                self.EXIT = (x, y)
+                        except ValueError:
+                            raise ValueError(f"Invalid configuration: Coordinates for {key} must be numbers.")
+                    elif key == "OUTPUT_FILE":
+                        self.OUTPUT_FILE = value
+                    elif key == "PERFECT":
+                        self.PERFECT = value.lower() == "true"
+        except FileNotFoundError:
+            raise ValueError(f"Error: The configuration file '{filename}' was not found.")
+    
     def validate_data(self):
         if self.WIDTH <= 0 or self.HEIGHT <= 0:
             raise ValueError("WIDTH and HEIGHT must be greater than 0.")
@@ -58,3 +81,16 @@ class Config:
             raise ValueError(
                 "OUTPUT_FILE is missing in the configuration."
             )
+
+try:
+    c = Config("Config.txt")
+    print(c.WIDTH)
+    print(c.HEIGHT)
+    print(c.ENTRY)
+    print(c.EXIT)
+    print(c.OUTPUT_FILE)
+    print(c.PERFECT)
+    print(c.SEED)
+
+except Exception as e:
+    print(e)

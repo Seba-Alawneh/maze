@@ -134,7 +134,6 @@ class MazeGenerator:
             self.imperfect_maze()
 
     def export_maze(self, solution: str) -> None: #....
-        """Write maze to output file in hex format."""
         with open(self.output_file, 'w') as f:
             for row in self.grid:
                 line: str = ''.join(cell.get_hex() for cell in row)
