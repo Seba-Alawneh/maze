@@ -61,7 +61,7 @@ class Config:
                         self.PERFECT = value.lower() == "true"
         except FileNotFoundError:
             raise ValueError(f"Error: The configuration file '{filename}' was not found.")
-    
+
     def validate_data(self):
         if self.WIDTH <= 0 or self.HEIGHT <= 0:
             raise ValueError("WIDTH and HEIGHT must be greater than 0.")
@@ -82,15 +82,16 @@ class Config:
                 "OUTPUT_FILE is missing in the configuration."
             )
 
-try:
-    c = Config("Config.txt")
-    print(c.WIDTH)
-    print(c.HEIGHT)
-    print(c.ENTRY)
-    print(c.EXIT)
-    print(c.OUTPUT_FILE)
-    print(c.PERFECT)
-    print(c.SEED)
+if __name__ == "__main__":
+    try:
+        c = Config("Config.txt")
+        print(c.WIDTH)
+        print(c.HEIGHT)
+        print(c.ENTRY)
+        print(c.EXIT)
+        print(c.OUTPUT_FILE)
+        print(c.PERFECT)
+        print(c.SEED)
 
-except Exception as e:
-    print(e)
+    except Exception as e:
+        print(e)
