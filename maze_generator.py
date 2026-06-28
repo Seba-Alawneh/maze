@@ -36,6 +36,27 @@ class MazeGenerator:
         self.output_file: str = config.OUTPUT_FILE  # ← ناقص هذا!
         random.seed(config.SEED)                   # 2. الـ random.seed لازم يكون قبل grid_gen عشان الـ seed يأثر على التوليد.
         self.grid: list[list[Cell]] = self.grid_gen()
+    
+    def embed_42_pattern(self) -> None:
+        pattern = [
+            "101 111",
+            "101 001",
+            "111 111",
+            "001 100",
+            "001 111"
+        ]
+        pattern_height = len(pattern)
+        pattern_width = len(pattern[0])
+        if self.width < pattern_width + 2 or self.height < pattern_height + 2:
+            print("Error: The maze size is too small to include the '42' pattern.")
+            return
+        start_x = (self.width - pattern_width) // 2
+        start_y = (self.height - pattern_height) // 2
+        for dy in range(pattern_height):
+            for dx in range(pattern_width):
+                if pattern[dy][dx] == '1':
+                    target_cell = self.grid[start_y + dy][start_x + dx]
+                    target_cell.visited = True
 
     def grid_gen(self) -> list[list[Cell]]:
         main_grid: list[list[Cell]] = []
@@ -114,6 +135,7 @@ class MazeGenerator:
                 self.remove_wall(current_cell, random_neighbor)
 
     def generate_maze(self) -> None:
+        self.embed_42_pattern()
         entry_point: Cell = self.grid[self.entry[1]][self.entry[0]]
         stack: list[Cell] = []
         current_cell: Cell = entry_point
