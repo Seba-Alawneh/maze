@@ -2,8 +2,11 @@ import sys
 from config_loader import Config
 from maze_generator import MazeGenerator
 from maze_solver import MazeSolver
-
-
+from TerminalRenderer import TerminalRenderer
+GREEN   = "\033[92m"
+YELLOW  = "\033[93m"
+CYAN    = "\033[96m"
+RESET   = "\033[0m"
 def main() -> None:
     """Main entry point for the maze generator."""
     if len(sys.argv) != 2:
@@ -29,7 +32,16 @@ def main() -> None:
         solver = MazeSolver(int_grid, config.ENTRY, config.EXIT)
         solver.solve()
         solution = solver.get_path_string()
-
+        #solution_string = solver.get_path_coords()
+        render = TerminalRenderer(
+            config.WIDTH,
+            config.HEIGHT,
+            int_grid,
+            config.EXIT,
+            config.ENTRY,
+            solution_coords
+        )
+        render.render(CYAN)
         # 5. اكتب الملف
         gen.export_maze(solution)
         print(f"Maze saved to {config.OUTPUT_FILE}")

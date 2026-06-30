@@ -18,11 +18,11 @@ class TerminalRenderer:
     def clear_screen(self):
         os.system('cls' if os.name == "nt" else 'clear')
 
-    def render(self):
+    def render(self, color):
         self.clear_screen()
         height = len(self.grid)
         width = len(self.grid[0])
-        color_wall = CYAN
+        color_wall = color
         
         # طباعة السقف العلوي
         print(f"{color_wall}╔{RESET}" + f"{color_wall}═══╦{RESET}" * (width - 1) + f"{color_wall}═══╗{RESET}")
