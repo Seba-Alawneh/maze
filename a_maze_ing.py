@@ -32,14 +32,14 @@ def main() -> None:
         solver = MazeSolver(int_grid, config.ENTRY, config.EXIT)
         solver.solve()
         solution = solver.get_path_string()
-        #solution_string = solver.get_path_coords()
+        solution_coord = solver.get_path_coord()
         render = TerminalRenderer(
             config.WIDTH,
             config.HEIGHT,
             int_grid,
             config.EXIT,
             config.ENTRY,
-            solution_coords
+            solution_coord
         )
         render.render(CYAN)
         # 5. اكتب الملف
