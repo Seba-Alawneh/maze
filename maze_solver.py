@@ -56,7 +56,18 @@ class MazeSolver:
                 queue.append((nx, ny, path + [direction]))
 
         return None
-    #def get_path_coord
+
+    def get_path_coord(self) -> list[tuple[int,int]]:
+        """Return path as list of (x,y) coordinates."""
+        coords: list[tuple[int,int]] = [self.entry]
+        x,y =self.entry
+        for direction in self.path:
+            dx, dy, _ = self.DIRECTIONS[direction]
+            x += dx
+            y += dy
+            coords.append((x,y))
+        return coords
+
     def get_path_string(self) -> str:
         """Return path as string of directions (e.g. 'SSSEEN')."""
         return ''.join(self.path)
