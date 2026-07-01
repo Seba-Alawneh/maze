@@ -8,7 +8,7 @@ class Config:
         self.EXIT = (0, 0)
         self.OUTPUT_FILE = ""
         self.PERFECT = False
-        self.SEED = 0
+        self.SEED = None
         self._load(filename)
         self.validate_data()
     @staticmethod

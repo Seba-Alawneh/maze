@@ -17,7 +17,7 @@ CYAN      = "\033[96m"
 RESET     = "\033[0m"
 
 # NOTE: List of colors that can be randomly chosen when user presses 3
-COLORS = [BROWN, PURPLE, PINK, DARK_BLUE, ORANGE, GRAY]
+COLORS = [BROWN, PURPLE, PINK, DARK_BLUE, ORANGE, GRAY, CYAN]
 
 
 # NOTE: Extracted as a separate function so it can be reused
@@ -59,6 +59,7 @@ def main() -> None:
         current_color = CYAN
 
         # NOTE: Main interactive loop - keeps running until user selects 4 (Quit)
+        color_index = 0
         while True:
             render = TerminalRenderer(
                 config.WIDTH,
@@ -77,20 +78,23 @@ def main() -> None:
             print("3. Rotate maze colors")
             print("4. Quit")
             choice = input("Choice? (1-4): ").strip()
-
+            
             if choice == "1":
-                # NOTE: Change seed randomly so each regeneration produces a different maze
                 gen, int_grid, solution_coord, solution = build_maze(config)
                 show_path = True
 
             elif choice == "2":
                 # NOTE: PDF requirement - Show/Hide valid shortest path
                 show_path = not show_path
-
+            
             elif choice == "3":
                 # NOTE: PDF requirement - Change maze wall colors
                 # Picks a random color from COLORS list (excludes green and yellow)
-                current_color = random.choice(COLORS)
+                
+                if color_index == len(COLORS):
+                    color_index = 0
+                current_color = COLORS[color_index]
+                color_index += 1
 
             elif choice == "4":
                 # NOTE: Save maze to output file before quitting

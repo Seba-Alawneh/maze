@@ -109,31 +109,41 @@ class MazeGenerator:
             next.north = False
 
     def imperfect_maze(self) -> None:
-        extra_wall: int = int((self.width * self.height) * 0.05)
-        for _ in range(extra_wall):
-            x: int = random.randint(0, self.width - 1)
-            y: int = random.randint(0, self.height - 1)
-            current_cell: Cell = self.grid[y][x]
+            extra_wall: int = int((self.width * self.height) * 0.05)
+            removed_count = 0
 
-            top = self.check_cell(x, y - 1)
-            bottom = self.check_cell(x, y + 1)
-            left = self.check_cell(x - 1, y)
-            right = self.check_cell(x + 1, y)
+            # استخدام while لضمان هدم العدد المطلوب من الجدران فعلياً
+            while removed_count < extra_wall:
+                x: int = random.randint(0, self.width - 1)
+                y: int = random.randint(0, self.height - 1)
+                current_cell: Cell = self.grid[y][x]
+                
+                # تجنب المساس بمربعات شعار الـ 42
+                if current_cell.get_hex() == 'F':
+                    continue
 
-            neighbors: list[Cell] = []
-            if top:
-                neighbors.append(top)
-            if bottom:
-                neighbors.append(bottom)
-            if left:
-                neighbors.append(left)
-            if right:
-                neighbors.append(right)
+                top = self.check_cell(x, y - 1)
+                bottom = self.check_cell(x, y + 1)
+                left = self.check_cell(x - 1, y)
+                right = self.check_cell(x + 1, y)
 
-            if neighbors:
-                random_neighbor = random.choice(neighbors)
-                self.remove_wall(current_cell, random_neighbor)
+                neighbors: list[Cell] = []
+                
+                # التأكد أن الجار ليس جزءاً من الشعار، وأن الجدار بينهما ما زال مبنياً (True)
+                if top and top.get_hex() != 'F' and current_cell.north:
+                    neighbors.append(top)
+                if bottom and bottom.get_hex() != 'F' and current_cell.south:
+                    neighbors.append(bottom)
+                if left and left.get_hex() != 'F' and current_cell.west:
+                    neighbors.append(left)
+                if right and right.get_hex() != 'F' and current_cell.east:
+                    neighbors.append(right)
 
+                # إذا وجدنا جدراناً صالحة للهدم، نهدم واحداً عشوائياً ونزيد العداد
+                if neighbors:
+                    random_neighbor = random.choice(neighbors)
+                    self.remove_wall(current_cell, random_neighbor)
+                    removed_count += 1
     def generate_maze(self) -> None:
         self.embed_42_pattern()
         entry_point: Cell = self.grid[self.entry[1]][self.entry[0]]
