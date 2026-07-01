@@ -2,7 +2,7 @@
 
 class Config:
     def __init__(self, filename: str):
-        self.WIDTH = 0
+        self.WIDTH=0
         self.HEIGHT = 0
         self.ENTRY = (0, 0)
         self.EXIT = (0, 0)
@@ -16,6 +16,10 @@ class Config:
         if len(parts) != 2:
             raise ValueError(
                 f"Bad syntax in configuration. Missing '{delimiter}' in: '{original_text.strip()}'"
+            )
+        if not parts[0].strip() or not parts[1].strip():
+            raise ValueError(
+                f"Bad syntax in configuration. Missing value for key in: '{original_text.strip()}'"
             )
     def _load(self, filename: str):
         seen_keys: set = set()
@@ -59,6 +63,12 @@ class Config:
                         self.OUTPUT_FILE = value
                     elif key == "PERFECT":
                         self.PERFECT = value.lower() == "true"
+            required_keys = ["WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE"]
+            for req_key in required_keys:
+                if req_key not in seen_keys:
+                    raise ValueError(f"Error: '{req_key}' is missing from the configuration file.")
+
+
         except FileNotFoundError:
             raise ValueError(f"Error: The configuration file '{filename}' was not found.")
 

@@ -39,8 +39,8 @@ class MazeGenerator:
     
     def embed_42_pattern(self) -> None:
         pattern = [
-            "101 111",
-            "101 001",
+            "100 111",
+            "100 001",
             "111 111",
             "001 100",
             "001 111"
