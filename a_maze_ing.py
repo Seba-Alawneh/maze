@@ -80,7 +80,6 @@ def main() -> None:
 
             if choice == "1":
                 # NOTE: Change seed randomly so each regeneration produces a different maze
-                config.SEED = random.randint(0, 99999)
                 gen, int_grid, solution_coord, solution = build_maze(config)
                 show_path = True
 

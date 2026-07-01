@@ -26,22 +26,10 @@ class TerminalRenderer:
         # NOTE: Works on both Windows (cls) and Linux/Mac (clear)
         os.system('cls' if os.name == "nt" else 'clear')
 
-    def check_terminal_size(self) -> bool:
-        # NOTE: PDF requirement - ensure terminal is large enough to display the maze
-        # Prevents visual glitches when terminal is too small
-        cols, rows = shutil.get_terminal_size()
-        needed_cols = self.width * 4 + 1
-        needed_rows = self.height * 2 + 2
-        if cols < needed_cols or rows < needed_rows:
-            print(f"⚠️  Terminal too small. Need at least {needed_cols}x{needed_rows}, got {cols}x{rows}")
-            return False
-        return True
-
     def render(self, color):
         # NOTE: color parameter receives the current wall color from a_maze_ing.py
         # This allows dynamic color change without modifying this class
-        if not self.check_terminal_size():
-            return
+
         self.clear_screen()
         height = len(self.grid)
         width = len(self.grid[0])
