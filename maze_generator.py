@@ -34,7 +34,8 @@ class MazeGenerator:
         self.exit: tuple = config.EXIT
         self.perfect: bool = config.PERFECT
         self.output_file: str = config.OUTPUT_FILE  # ← ناقص هذا!
-        random.seed(config.SEED)                   # 2. الـ random.seed لازم يكون قبل grid_gen عشان الـ seed يأثر على التوليد.
+        self.warning: str = ""
+        random.seed(config.SEED)# 2. الـ random.seed لازم يكون قبل grid_gen عشان الـ seed يأثر على التوليد.
         self.grid: list[list[Cell]] = self.grid_gen()
     
     def embed_42_pattern(self) -> None:
@@ -48,7 +49,7 @@ class MazeGenerator:
         pattern_height = len(pattern)
         pattern_width = len(pattern[0])
         if self.width < pattern_width + 2 or self.height < pattern_height + 2:
-            print("Error: The maze size is too small to include the '42' pattern.")
+            self.warning = "WARNING: The maze size is too small to include the '42' pattern."
             return
         start_x = (self.width - pattern_width) // 2
         start_y = (self.height - pattern_height) // 2

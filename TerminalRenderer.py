@@ -1,6 +1,5 @@
 from config_loader import Config
 import os
-import shutil
 
 # NOTE: Green and Yellow are reserved - do NOT use them as wall colors
 # Green = solution path marker

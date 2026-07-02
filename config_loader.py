@@ -32,7 +32,7 @@ class Config:
                     parts = line.split("=", 1)
                     Config.check_split(parts, line, "=")
                     key, value = parts
-                    key = key.strip()
+                    key = key.strip().upper()
                     value = value.strip()
                     if key in seen_keys:
                         raise ValueError(f"Duplicate key found in configuration: {key}")

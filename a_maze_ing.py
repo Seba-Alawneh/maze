@@ -1,5 +1,4 @@
 import sys
-import random
 from config_loader import Config
 from maze_generator import MazeGenerator
 from maze_solver import MazeSolver
@@ -8,12 +7,13 @@ from TerminalRenderer import TerminalRenderer
 # NOTE: Wall colors for "Rotate maze colors" feature (PDF requirement)
 # Green and Yellow are reserved for path and entry/exit markers
 BROWN     = "\033[38;5;94m"
-PURPLE    = "\033[38;5;93m"
-PINK      = "\033[38;5;205m"
+PURPLE    = "\033[38;5;134m"
+PINK      = "\033[38;5;218m"
 DARK_BLUE = "\033[38;5;19m"
-ORANGE    = "\033[38;5;208m"
+ORANGE    = "\033[38;5;137m"
 GRAY      = "\033[38;5;245m"
 CYAN      = "\033[96m"
+RED = "\033[38;5;196m"
 RESET     = "\033[0m"
 
 # NOTE: List of colors that can be randomly chosen when user presses 3
@@ -71,6 +71,8 @@ def main() -> None:
                 # NOTE: If show_path is False, pass empty list to hide the path
             )
             render.render(current_color)
+            if gen.warning:
+                print(f"{RED}{gen.warning}{RESET}")
 
             print("\n=== A-Maze-ing ===")
             print("1. Re-generate a new maze")
@@ -104,11 +106,13 @@ def main() -> None:
                 break
 
             else:
-                print("Invalid choice, try again.")
+                print("Invalid choice, try again you have to choose [1, 2, 3, 4]")
+                input("Press Enter to continue...")
 
-    except Exception as e:
+    except (ValueError) as e:
         print(e)
-
-
+    except KeyboardInterrupt:
+        print("\r\033[K")
+        sys.exit(0)
 if __name__ == "__main__":
     main()
