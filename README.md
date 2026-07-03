@@ -216,15 +216,13 @@ package at the root of this repository: `mazegen-1.0.0-py3-none-any.whl` /
 ## Resources
 
 - [Wikipedia — Maze generation algorithm](https://en.wikipedia.org/wiki/Maze_generation_algorithm)
-- [Jamis Buck — "Buckblog": Maze Generation series](https://weblog.jamisbuck.org/2011/2/7/maze-generation-algorithm-recap)
-- Python official documentation: [`random`](https://docs.python.org/3/library/random.html),
-  [`collections.deque`](https://docs.python.org/3/library/collections.html#collections.deque)
-  (used for BFS in the solver)
-- [PEP 257 — Docstring Conventions](https://peps.python.org/pep-0257/)
+- [https://youtu.be/Y37-gB83HKE?si=3TvKyw6OmTu2oYyU]
+- [https://youtu.be/HyK_Q5rrcr4?si=VUxr9n5kCWx68xQU]
+- [https://youtu.be/WbzNRTTrX0g?si=qtNDYSqz9DXZAFcS]
 
 ### How AI was used
 
-We used Claude (Anthropic) as a debugging and code-review assistant throughout this project,
+We used AI (Anthropic) as a debugging and code-review assistant throughout this project,
 specifically for:
 
 - **Diagnosing a visual bug**: the solution path sometimes covered most of the maze, hiding the
