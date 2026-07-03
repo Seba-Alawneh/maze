@@ -79,15 +79,6 @@ make lint-strict
 - setup.py
 - Makefile
 
----
-
-## Team
-
-habu-har: generator + config  
-salalawn: solver + rendering + integration
-
----
-
 ## AI Usage
 
 Used only for debugging and review. All code written and understood by team.
