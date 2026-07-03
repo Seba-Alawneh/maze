@@ -1,6 +1,7 @@
 *This activity has been created as part of the 42 curriculum by habu-har, salalawn.*
 
 # A-Maze-Ing
+https://github.com/Seba-Alawneh/maze/blob/main/Screenshot%202026-07-03%20211258.png
 
 ## Description
 
