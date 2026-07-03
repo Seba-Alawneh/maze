@@ -130,7 +130,7 @@ in every generated maze — this was the main bug fixed during development (see
 
 **Wall colors rotated** — via menu option 3:
 
-![Maze with rotated wall colors](docs/screenshots/maze_rotated_colors.png)
+
 
 ## Maze Generation Algorithm
 
