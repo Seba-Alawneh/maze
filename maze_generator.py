@@ -110,7 +110,7 @@ class MazeGenerator:
             next.north = False
 
     def imperfect_maze(self) -> None:
-            extra_wall: int = int((self.width * self.height) * 0.05)
+            extra_wall: int = max(1, int((self.width * self.height) * 0.05))
             removed_count = 0
 
             # استخدام while لضمان هدم العدد المطلوب من الجدران فعلياً
@@ -149,19 +149,18 @@ class MazeGenerator:
         self.embed_42_pattern()
         entry_point: Cell = self.grid[self.entry[1]][self.entry[0]]
         stack: list[Cell] = []
-        current_cell: Cell = entry_point
-        current_cell.visited = True
-        stack.append(current_cell)
+        entry_point.visited = True
+        stack.append(entry_point)
 
         while stack:
+            current_cell = stack[-1]
             next_cell = self.get_unvisited_neighbors(current_cell)
             if next_cell:
+                self.remove_wall(current_cell, next_cell)
                 next_cell.visited = True
                 stack.append(next_cell)
-                self.remove_wall(current_cell, next_cell)
-                current_cell = next_cell
             else:
-                current_cell = stack.pop()
+                stack.pop()
 
         if not self.perfect:
             self.imperfect_maze()

@@ -7,7 +7,7 @@ class Config:
         self.ENTRY = (0, 0)
         self.EXIT = (0, 0)
         self.OUTPUT_FILE = ""
-        self.PERFECT = False
+        self.PERFECT = True
         self.SEED = None
         self._load(filename)
         self.validate_data()
@@ -73,8 +73,8 @@ class Config:
             raise ValueError(f"Error: The configuration file '{filename}' was not found.")
 
     def validate_data(self):
-        if self.WIDTH <= 0 or self.HEIGHT <= 0:
-            raise ValueError("WIDTH and HEIGHT must be greater than 0.")
+        if self.WIDTH <= 1 or self.HEIGHT <= 1:
+            raise ValueError("WIDTH and HEIGHT must be greater than 1.")
 
         if self.ENTRY == self.EXIT:
             raise ValueError("ENTRY and EXIT points must be different.")
