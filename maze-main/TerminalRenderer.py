@@ -1,40 +1,47 @@
-from config_loader import Config
 import os
 
 # NOTE: Green and Yellow are reserved - do NOT use them as wall colors
 # Green = solution path marker
 # Yellow = entry/exit marker
-GREEN   = "\033[92m"
-YELLOW  = "\033[93m"
-CYAN    = "\033[96m"
-RESET   = "\033[0m"
+GREEN = "\033[92m"
+YELLOW = "\033[93m"
+CYAN = "\033[96m"
+RESET = "\033[0m"
 
 
 class TerminalRenderer:
-    def __init__(self, maze_width: int, maze_height: int, grid, exit, entry, solution_path=None):
+    """Renders the maze in the terminal using ASCII art with colors."""
+
+    def __init__(
+        self,
+        maze_width: int,
+        maze_height: int,
+        grid: list[list[int]],
+        exit_pos: tuple[int, int],
+        entry_pos: tuple[int, int],
+        solution_path: list[tuple[int, int]] | None = None,
+    ) -> None:
+        """Initialize the renderer with maze data."""
         self.width = maze_width
         self.height = maze_height
         self.grid = grid
-        self.entry = entry
-        self.exit = exit
-        # NOTE: solution_path is a list of (x,y) coordinates from MazeSolver.get_path_coord()
-        # If empty list is passed, path is hidden (used for Show/Hide toggle)
-        self.solution_path = solution_path if solution_path else []
+        self.entry = entry_pos
+        self.exit = exit_pos
+        # If solution_path is empty list, the path is hidden
+        self.solution_path = solution_path if solution_path is not None else []
 
-    def clear_screen(self):
-        # NOTE: Works on both Windows (cls) and Linux/Mac (clear)
+    def clear_screen(self) -> None:
+        """Clear the terminal screen (works on Windows and Unix)."""
         os.system('cls' if os.name == "nt" else 'clear')
 
-    def render(self, color):
-        # NOTE: color parameter receives the current wall color from a_maze_ing.py
-        # This allows dynamic color change without modifying this class
-
+    def render(self, color: str) -> None:
+        """Render the maze with the given wall color."""
         self.clear_screen()
         height = len(self.grid)
         width = len(self.grid[0])
         color_wall = color
 
-        # NOTE: Top border of the maze
+        # Top border
         print(f"{color_wall}╔{RESET}" + f"{color_wall}═══╦{RESET}" * (width - 1) + f"{color_wall}═══╗{RESET}")
 
         for y in range(height):
@@ -45,26 +52,22 @@ class TerminalRenderer:
                 cell = self.grid[y][x]
 
                 if (x, y) == self.entry:
-                    # NOTE: Entry point marker (yellow crown)
-                    content = f"{YELLOW} ♛ {RESET}"
+                    content = f"{YELLOW} ♛ {RESET}"   # Entry marker
                 elif (x, y) == self.exit:
-                    # NOTE: Exit point marker (yellow flag)
-                    content = f"{YELLOW} ⚑ {RESET}"
-                elif cell == 15:
-                    # NOTE: cell == 15 means all 4 walls closed (N=1+E=2+S=4+W=8=15)
-                    # This is used for the "42" pattern - displayed in wall color
+                    content = f"{YELLOW} ⚑ {RESET}"    # Exit marker
+                elif cell == 15:  # All walls closed (used for '42' pattern)
                     content = f"{color_wall}███{RESET}"
                 elif (x, y) in self.solution_path:
-                    # NOTE: PDF requirement - show solution path in green
-                    content = f"{GREEN} ⬢ {RESET}"
+                    content = f"{GREEN} ⬢ {RESET}"     # Solution path
                 else:
                     content = "   "
+
                 line_cells += content
 
-                # NOTE: East wall check using bitwise AND (E=2)
+                # East wall
                 line_cells += f"{color_wall}║{RESET}" if cell & 2 else " "
 
-                # NOTE: South wall check using bitwise AND (S=4)
+                # South wall
                 line_walls += f"{color_wall}═══{RESET}" if cell & 4 else "   "
                 line_walls += f"{color_wall}╬{RESET}" if x < width - 1 else f"{color_wall}╣{RESET}"
 
@@ -72,5 +75,5 @@ class TerminalRenderer:
             if y != height - 1:
                 print(line_walls)
 
-        # NOTE: Bottom border of the maze
+        # Bottom border
         print(f"{color_wall}╚{RESET}" + f"{color_wall}═══╩{RESET}" * (width - 1) + f"{color_wall}═══╝{RESET}")

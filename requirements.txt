@@ -1,7 +1,0 @@
-# Core dependencies for building the package
-setuptools>=65.0
-wheel
-
-# Development and linting tools
-flake8
-mypy
