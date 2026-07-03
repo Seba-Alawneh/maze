@@ -1,5 +1,7 @@
 import sys
 import shutil
+import os
+import time
 from config_loader import Config
 from maze_generator import MazeGenerator
 from maze_solver import MazeSolver
@@ -37,6 +39,38 @@ def build_maze(config: Config) -> tuple[MazeGenerator, list[list[int]], list[tup
     return gen, int_grid, solution_coord, solution
 
 
+def wait_for_terminal_size(width: int, height: int) -> None:
+    """Block until the terminal is at least as big as the maze needs.
+
+    Polls the terminal size every 0.3s (no key press required). While it's
+    too small, clears the screen and shows a live-updating warning with the
+    current size; as soon as it's big enough, returns immediately so the
+    caller can render the maze.
+
+    Args:
+        width: Maze width in cells (used to compute the minimum columns).
+        height: Maze height in cells (used to compute the minimum lines).
+    """
+    min_width = width * 4 + 10
+    min_height = height * 2 + 15
+
+    while True:
+        try:
+            columns, lines = shutil.get_terminal_size()
+        except Exception:
+            return  # can't detect size, don't block the user forever
+
+        if columns >= min_width and lines >= min_height:
+            return
+
+        os.system('cls' if os.name == "nt" else 'clear')
+        print(f"{RED}Warning: Terminal window is too small!{RESET}")
+        print(f"Current size: {columns}x{lines}")
+        print(f"Recommended minimum: {min_width}x{min_height}")
+        print("Please enlarge your terminal window... (checking automatically)")
+        time.sleep(0.3)
+
+
 def main() -> None:
     """Main entry point for the maze generator."""
     if len(sys.argv) != 2:
@@ -54,21 +88,10 @@ def main() -> None:
         color_index = 0
 
         while True:
-            # Check terminal size before rendering
-            try:
-                columns, lines = shutil.get_terminal_size()
-                min_width = config.WIDTH * 4 + 10
-                min_height = config.HEIGHT * 2 + 15
-
-                if columns < min_width or lines < min_height:
-                    print(f"\033[91mWarning: Terminal window is too small!\033[0m")
-                    print(f"Current size: {columns}x{lines}")
-                    print(f"Recommended minimum: {min_width}x{min_height}")
-                    print("Please enlarge your terminal window and press Enter to continue...")
-                    input()
-                    continue
-            except:
-                pass  # If can't get terminal size, continue anyway
+            # NOTE: replaced the old "print warning + input()" check with a
+            # live poll: no key press needed, it just waits until the
+            # terminal is big enough and then continues automatically.
+            wait_for_terminal_size(config.WIDTH, config.HEIGHT)
 
             render = TerminalRenderer(
                 config.WIDTH,
