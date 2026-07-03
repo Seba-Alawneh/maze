@@ -3,13 +3,13 @@ from typing import Optional
 
 
 class MazeSolver:
-    """Finds the shortest path in a maze using BFS."""
+    """Finds the shortest path in a maze using Breadth-First Search (BFS)."""
 
     DIRECTIONS = {
-        'N': (0, -1, 1),
-        'E': (1,  0, 2),
-        'S': (0,  1, 4),
-        'W': (-1, 0, 8),
+        'N': (0, -1, 1),   # North: delta_x, delta_y, wall_bit
+        'E': (1,  0, 2),   # East
+        'S': (0,  1, 4),   # South
+        'W': (-1, 0, 8),   # West
     }
 
     def __init__(
@@ -18,21 +18,25 @@ class MazeSolver:
         entry: tuple[int, int],
         exit: tuple[int, int],
     ) -> None:
-        """Initialize solver with maze grid and entry/exit points."""
+        """Initialize the solver with the maze grid and start/end points."""
         self.grid = grid
         self.entry = entry
         self.exit = exit
         self.path: list[str] = []
 
     def solve(self) -> Optional[list[str]]:
-        """Find shortest path using BFS. Returns list of directions or None."""
+        """Find the shortest path from entry to exit using BFS.
+
+        Returns:
+            List of directions (N/E/S/W) if path exists, otherwise None.
+        """
         width = len(self.grid[0])
         height = len(self.grid)
 
         queue: deque = deque()
         queue.append((self.entry[0], self.entry[1], []))
 
-        visited: set = set()
+        visited: set[tuple[int, int]] = set()
         visited.add(self.entry)
 
         while queue:
@@ -47,7 +51,7 @@ class MazeSolver:
 
                 if not (0 <= nx < width and 0 <= ny < height):
                     continue
-                if self.grid[y][x] & wall:
+                if self.grid[y][x] & wall:  # Wall is present
                     continue
                 if (nx, ny) in visited:
                     continue
@@ -57,23 +61,26 @@ class MazeSolver:
 
         return None
 
-    def get_path_coord(self) -> list[tuple[int,int]]:
-        """Return path as list of (x,y) coordinates."""
-        coords: list[tuple[int,int]] = [self.entry]
-        x,y =self.entry
+    def get_path_coord(self) -> list[tuple[int, int]]:
+        """Convert the path directions into list of (x, y) coordinates."""
+        coords: list[tuple[int, int]] = [self.entry]
+        x, y = self.entry
+
         for direction in self.path:
             dx, dy, _ = self.DIRECTIONS[direction]
             x += dx
             y += dy
-            coords.append((x,y))
+            coords.append((x, y))
+
         return coords
 
     def get_path_string(self) -> str:
-        """Return path as string of directions (e.g. 'SSSEEN')."""
+        """Return the path as a string of directions (e.g. 'SSSEEN')."""
         return ''.join(self.path)
 
 
 if __name__ == "__main__":
+    # Test with a small fake maze
     fake_grid = [
         [11, 15, 15],
         [10, 15, 15],
@@ -81,8 +88,9 @@ if __name__ == "__main__":
     ]
     solver = MazeSolver(fake_grid, (0, 0), (2, 2))
     result = solver.solve()
+
     if result:
-        print("path:", solver.get_path_string())
+        print("Path:", solver.get_path_string())
         print("Number of steps:", len(result))
     else:
-        print("What's in the path ")
+        print("No path found")
