@@ -134,39 +134,23 @@ in every generated maze — this was the main bug fixed during development (see
 
 ## Maze Generation Algorithm
 
-We use **Randomized Prim's Algorithm**:
+We use the **Recursive Backtracker** algorithm (a randomized Depth-First Search):
 
-1. Start from the entry cell, mark it as part of the maze.
-2. Maintain a "frontier" list of all unvisited cells adjacent to the maze.
-3. Repeatedly pick a random cell from the frontier, connect it to one random already-visited
-   neighbor (knocking down the wall between them), mark it visited, and add its own unvisited
-   neighbors to the frontier.
-4. Stop when the frontier is empty — every reachable cell is now part of a single spanning tree.
-5. If `PERFECT=False`, an extra ~5% of interior walls are removed afterwards to introduce loops
-   (multiple possible paths), while carefully avoiding the "42" pattern cells.
+1. Start from the entry cell, mark it as visited, and push it to a stack.
+2. While the stack is not empty, peek at the top cell (the current cell).
+3. Find all unvisited neighbors of the current cell and pick one at random.
+4. If a valid unvisited neighbor exists, remove the wall between the current cell and the neighbor, mark the neighbor as visited, and push it to the stack.
+5. If no unvisited neighbors exist (meaning we hit a dead end), pop the current cell from the stack to backtrack to the previous intersection.
+6. Stop when the stack is empty — every reachable cell is now connected and part of a single spanning tree.
+7. If `PERFECT=False`, an extra ~5% of interior walls are removed afterwards to introduce loops (multiple possible paths), while carefully avoiding the "42" pattern cells.
 
 ### Why this algorithm
 
-We initially implemented a **Recursive Backtracker** (randomized depth-first search with a
-stack), which is simpler to reason about but has a well-known side effect: it tends to produce
-very long, winding corridors with few branches. On our grid, this meant the *unique* path between
-entry and exit (since `PERFECT=True` guarantees only one path exists) would sometimes snake
-through more than half of the maze — visually "flooding" the screen with the solution path and
-overwhelming the "42" pattern instead of leaving it clearly visible.
+We implemented the Recursive Backtracker because it is an elegant, stack-based approach that generates classic "perfect" mazes. It is known for producing mazes with a high "river" factor—meaning it creates long, winding corridors and deep dead ends. This makes the maze visually striking and suitably challenging to solve.
 
-We measured this directly: over repeated random generations, the Recursive Backtracker produced
-solution paths ranging from ~66 to ~168 cells (out of ~280 usable cells). Switching to Randomized
-Prim's Algorithm — which grows the maze from many directions at once instead of a single advancing
-line — consistently produced much shorter, more balanced solution paths (~34 to ~46 cells) while
-still satisfying every correctness requirement of the specification (full connectivity, coherent
-walls, sealed borders, no open area wider than 2 cells, and exactly one path when `PERFECT=True`).
+One subtlety we had to handle: the "42" pattern cells are embedded before generation starts. We avoid carving into them by ensuring the algorithm checks the wall constraints (`get_hex() != 'F'`) when identifying valid neighbors and applying imperfections, keeping the pattern perfectly intact.
 
-One subtlety we had to handle: the "42" pattern cells are marked as already "visited" before
-generation starts (so the algorithm never carves into them), but they must never be treated as a
-legitimate connection point either. We solve this without any extra class attribute or method: a
-"42" cell is recognized at runtime because it permanently keeps all 4 walls closed
-(`get_hex() == 'F'`), the only exception being the entry cell itself, which also starts fully
-closed before its very first wall is opened.
+
 
 ## Reusable Code
 
