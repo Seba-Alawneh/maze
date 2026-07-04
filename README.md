@@ -233,27 +233,18 @@ program logic, structure, and initial implementation are our own work.
 
 ### Roles
 
-Work was split by module, with a lot of cross-review and mutual debugging rather than
-strictly separate silos — whoever finished their part first would jump in and help review
-or fix the other's code, so the split below reflects primary ownership, not the only
-person who ever touched that file.
+- **salalawn**: 
+  - **Core Logic & Generation**: Designed and implemented the core maze generation algorithm in `maze_generator.py` using a Randomized Recursive Backtracker.
+  - **Pattern & Imperfections**: Built the logic to seamlessly embed the "42" pattern and implemented the `imperfect_maze` function to randomly remove walls and create multiple paths.
+  - **UI & Configuration**: Developed the terminal rendering engine (`TerminalRenderer.py`), the configuration loader with strict validation (`config_loader.py`), designed the main configuration file (`config.txt`), and built the interactive main loop (`a_maze_ing.py`).
 
-- **habu-har**: packaging the reusable module as an installable pip package (`mazegen-*`,
-  `pyproject.toml`), the `Makefile` (install/run/debug/clean/lint targets), the BFS
-  `maze_solver.py`, the `.gitignore`, and the project-wide code-quality pass — adding
-  type hints (`typing` module) and getting the whole project to pass `mypy` cleanly,
-  writing the PEP 257 docstrings for every class, and auditing resource handling
-  (e.g. making sure file operations use `with` context managers instead of manual
-  open/close) to avoid leaks.
-- **salalawn**: the terminal rendering (`TerminalRenderer.py`), the configuration loader
-  (`config_loader.py`) and `config.txt`, and the interactive menu / terminal-size
-  handling in `a_maze_ing.py` (checking the window is large enough before drawing the
-  maze, and prompting the user to enlarge it otherwise).
+- **habu-har**: 
+  - **Pathfinding & Solver**: Implemented the BFS shortest-path algorithm in `maze_solver.py`.
+  - **Packaging & CI**: Handled packaging the reusable module as an installable pip package, creating the `Makefile` (install/run/debug/clean/lint targets), and managing `.gitignore`.
+  - **Code Quality & Debugging**: Led the project-wide code-quality pass, adding type hints (`typing` module) to pass `mypy` cleanly, writing PEP 257 docstrings, auditing resource handling[cite: 7], and assisted in debugging and resolving various edge cases.
 
-The maze generation itself (`maze_generator.py`) — including the "42" pattern and the
-switch from a Recursive Backtracker to Randomized Prim's Algorithm to fix the
-long-solution-path bug — was debugged and rewritten together.
-
+- **Collaborative Work**:
+  - Integration of the solver with the generator and debugging together to ensure the solution path displays correctly without obscuring the "42" pattern.
 ### Planning
 
 Our initial plan was to split the project cleanly down the middle: one of us owns
