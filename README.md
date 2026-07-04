@@ -246,7 +246,6 @@ checks across dozens of random mazes), and understood by us before being committ
 program logic, structure, and initial implementation are our own work.
 
 ## Team and Project Management
-
 ### Roles
 
 Work was split by module, with a lot of cross-review and mutual debugging rather than
@@ -254,22 +253,16 @@ strictly separate silos — whoever finished their part first would jump in and 
 or fix the other's code, so the split below reflects primary ownership, not the only
 person who ever touched that file.
 
-- **habu-har**: packaging the reusable module as an installable pip package (`mazegen-*`,
-  `pyproject.toml`), the `Makefile` (install/run/debug/clean/lint targets), the BFS
-  `maze_solver.py`, the `.gitignore`, and the project-wide code-quality pass — adding
-  type hints (`typing` module) and getting the whole project to pass `mypy` cleanly,
-  writing the PEP 257 docstrings for every class, and auditing resource handling
-  (e.g. making sure file operations use `with` context managers instead of manual
-  open/close) to avoid leaks.
-- **salalawn**: the terminal rendering (`TerminalRenderer.py`), the configuration loader
-  (`config_loader.py`) and `config.txt`, and the interactive menu / terminal-size
-  handling in `a_maze_ing.py` (checking the window is large enough before drawing the
-  maze, and prompting the user to enlarge it otherwise).
+- **salalawn**: Primary ownership of the core maze generation logic (`maze_generator.py`)
+  including the DFS algorithm and PERFECT/non-PERFECT maze variations, the configuration
+  management (`config_loader.py` and `config.txt`), and the visual output via the
+  terminal rendering engine (`TerminalRenderer.py`).
 
-The maze generation itself (`maze_generator.py`) — including the "42" pattern and the
-switch from a Recursive Backtracker to Randomized Prim's Algorithm to fix the
-long-solution-path bug — was debugged and rewritten together.
-
+- **habu-har**: Packaging the reusable module as an installable pip package (`mazegen-*`,
+  `pyproject.toml`), the `Makefile` (install/run/debug/clean/lint targets), the main
+  execution script and interactive prompts (`a_maze_ing.py`), the BFS `maze_solver.py`,
+  and project-wide tasks including `.gitignore` and code-quality passes (type hints,
+  clean `mypy` execution, PEP 257 docstrings, and safe resource handling).
 ### Planning
 
 Our initial plan was to split the project cleanly down the middle: one of us owns
