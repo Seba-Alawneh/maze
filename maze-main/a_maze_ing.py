@@ -1,13 +1,11 @@
 import sys
 import shutil
-import os
-import time
 from config_loader import Config
 from maze_generator import MazeGenerator
 from maze_solver import MazeSolver
 from TerminalRenderer import TerminalRenderer
 
-# Wall colors for "Rotate maze colors" feature
+# Wall colors
 BROWN = "\033[38;5;94m"
 PURPLE = "\033[38;5;134m"
 PINK = "\033[38;5;218m"
@@ -21,65 +19,26 @@ RESET = "\033[0m"
 COLORS = [BROWN, PURPLE, PINK, DARK_BLUE, ORANGE, GRAY, CYAN]
 
 
-def build_maze(config: Config) -> tuple[MazeGenerator, list[list[int]], list[tuple[int, int]], str]:
-    """Generate maze, solve it and return all needed data for rendering."""
+def build_maze(config: Config):
     gen = MazeGenerator(config)
     gen.generate_maze()
-
-    int_grid: list[list[int]] = []
-    for row in gen.grid:
-        int_row = [int(cell.get_hex(), 16) for cell in row]
-        int_grid.append(int_row)
-
+    int_grid = [[int(cell.get_hex(), 16) for cell in row] for row in gen.grid]
     solver = MazeSolver(int_grid, config.ENTRY, config.EXIT)
     solver.solve()
-    solution = solver.get_path_string()
-    solution_coord = solver.get_path_coord()
-
-    return gen, int_grid, solution_coord, solution
-
-
-def wait_for_terminal_size(width: int, height: int) -> None:
-    """Block until the terminal is at least as big as the maze needs.
-
-    Polls the terminal size every 0.3s (no key press required). While it's
-    too small, clears the screen and shows a live-updating warning with the
-    current size; as soon as it's big enough, returns immediately so the
-    caller can render the maze.
-
-    Args:
-        width: Maze width in cells (used to compute the minimum columns).
-        height: Maze height in cells (used to compute the minimum lines).
-    """
-    min_width = width * 4 + 10
-    min_height = height * 2 + 15
-
-    while True:
-        try:
-            columns, lines = shutil.get_terminal_size()
-        except Exception:
-            return  # can't detect size, don't block the user forever
-
-        if columns >= min_width and lines >= min_height:
-            return
-
-        os.system('cls' if os.name == "nt" else 'clear')
-        print(f"{RED}Warning: Terminal window is too small!{RESET}")
-        print(f"Current size: {columns}x{lines}")
-        print(f"Recommended minimum: {min_width}x{min_height}")
-        print("Please enlarge your terminal window... (checking automatically)")
-        time.sleep(0.3)
+    return gen, int_grid, solver.get_path_coord(), solver.get_path_string()
 
 
 def main() -> None:
-    """Main entry point for the maze generator."""
     if len(sys.argv) != 2:
         print("Usage: python3 a_maze_ing.py config.txt")
         sys.exit(1)
 
     try:
-        config_file = sys.argv[1]
-        config = Config(config_file)
+        config = Config(sys.argv[1])
+
+        # Enforce exact size 20x15
+        if config.WIDTH != 20 or config.HEIGHT != 15:
+            raise ValueError("Maze size must be exactly WIDTH=20, HEIGHT=15")
 
         gen, int_grid, solution_coord, solution = build_maze(config)
 
@@ -88,17 +47,24 @@ def main() -> None:
         color_index = 0
 
         while True:
-            # NOTE: replaced the old "print warning + input()" check with a
-            # live poll: no key press needed, it just waits until the
-            # terminal is big enough and then continues automatically.
-            wait_for_terminal_size(config.WIDTH, config.HEIGHT)
+            # Simple terminal size check
+            try:
+                columns, lines = shutil.get_terminal_size()
+                min_w = config.WIDTH * 4 + 10
+                min_h = config.HEIGHT * 2 + 15
+
+                if columns < min_w or lines < min_h:
+                    print(f"\033[91mTerminal too small ({columns}x{lines})!\033[0m")
+                    print(f"Needed: {min_w}x{min_h}")
+                    print("Enlarge your terminal and press Enter...")
+                    input()
+                    continue
+            except:
+                pass
 
             render = TerminalRenderer(
-                config.WIDTH,
-                config.HEIGHT,
-                int_grid,
-                config.EXIT,
-                config.ENTRY,
+                config.WIDTH, config.HEIGHT, int_grid,
+                config.EXIT, config.ENTRY,
                 solution_coord if show_path else []
             )
             render.render(current_color)
