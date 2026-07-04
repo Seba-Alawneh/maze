@@ -33,7 +33,7 @@ class MazeSolver:
         width = len(self.grid[0])
         height = len(self.grid)
 
-        queue: deque = deque()
+        queue: deque[tuple[int, int, list[str]]] = deque()
         queue.append((self.entry[0], self.entry[1], []))
 
         visited: set[tuple[int, int]] = set()

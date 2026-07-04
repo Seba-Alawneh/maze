@@ -1,10 +1,13 @@
 import random
-from typing import Union
+from typing import Optional
 from config_loader import Config
 
 
 class Cell:
-    """Represents a single cell in the maze with its walls and visitation state."""
+    """Represents a single cell in the maze.
+
+    Tracks its walls and visitation state.
+    """
 
     def __init__(self, x: int, y: int) -> None:
         """Initialize a new cell with all walls closed."""
@@ -61,8 +64,14 @@ class MazeGenerator:
         pattern_height = len(pattern)
         pattern_width = len(pattern[0])
 
-        if self.width < pattern_width + 2 or self.height < pattern_height + 2:
-            self.warning = "WARNING: The maze size is too small to include the '42' pattern."
+        if (
+            self.width < pattern_width + 2
+            or self.height < pattern_height + 2
+        ):
+            self.warning = (
+                "WARNING: The maze size is too small to include "
+                "the '42' pattern."
+            )
             return
 
         start_x = (self.width - pattern_width) // 2
@@ -72,6 +81,12 @@ class MazeGenerator:
             for dx in range(pattern_width):
                 if pattern[dy][dx] == '1':
                     target_cell = self.grid[start_y + dy][start_x + dx]
+                    target_coord = (target_cell.x, target_cell.y)
+                    if target_coord == self.entry or target_coord == self.exit:
+                        raise ValueError(
+                            "Error: '42' pattern overlaps with "
+                            "ENTRY or EXIT points!"
+                        )
                     target_cell.visited = True
 
     def grid_gen(self) -> list[list[Cell]]:
@@ -84,14 +99,14 @@ class MazeGenerator:
             main_grid.append(row)
         return main_grid
 
-    def check_cell(self, x: int, y: int) -> Union[Cell, bool]:
-        """Return the cell at (x, y) or False if out of bounds."""
+    def check_cell(self, x: int, y: int) -> Optional[Cell]:
+        """Return the cell at (x, y) or None if out of bounds."""
         if x >= self.width or x < 0 or y >= self.height or y < 0:
-            return False
+            return None
         return self.grid[y][x]
 
-    def get_unvisited_neighbors(self, cell: Cell) -> Union[Cell, bool]:
-        """Return a random unvisited neighbor or False if none exist."""
+    def get_unvisited_neighbors(self, cell: Cell) -> Optional[Cell]:
+        """Return a random unvisited neighbor or None if none exist."""
         neighbors: list[Cell] = []
         x: int = cell.x
         y: int = cell.y
@@ -110,7 +125,7 @@ class MazeGenerator:
         if right and not right.visited:
             neighbors.append(right)
 
-        return random.choice(neighbors) if neighbors else False
+        return random.choice(neighbors) if neighbors else None
 
     def remove_wall(self, current: Cell, next_cell: Cell) -> None:
         """Remove the wall between two adjacent cells."""

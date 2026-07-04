@@ -60,46 +60,13 @@ Once running, use the on-screen menu to:
 3. Rotate the maze wall colors
 4. Quit
 
-### Installation using a virtual environment (venv)
-
-If you'd like to work inside a virtual environment (recommended, so you don't mix things up
-with your system-wide Python packages), follow these steps in order:
+### Debugging
 
 ```bash
-# 1. Clone the project and move into its folder
-git clone <this-repository-url>
-cd a-maze-ing
-
-# 2. Create the virtual environment
-python3 -m venv venv
-
-# 3. Activate the virtual environment
-source venv/bin/activate
-
-# 4. Upgrade pip inside the virtual environment
-pip install --upgrade pip
-
-# 5. Install the project and its dependencies (via pyproject.toml, not requirements.txt)
-pip install -e .
-
-# 6. (Optional) Check where you are and what's in the folder
-ls
-
-# 7. Run the style and type checks
-make lint
-
-# 8. Run the program
-make run
+make debug
 ```
 
-**Important notes:**
-
-- `cd a-maze-ing` must happen *before* creating or activating the virtual environment, not after.
-- The project has no `requirements.txt` file; dependencies are declared in `pyproject.toml`
-  (since the `mazegen` library is packaged as a pip package), so `pip install -e .` is the
-  correct command instead of `pip install -r requirements.txt`.
-- `pip install --upgrade pip` logically belongs *before* installing the project, not after.
-- To deactivate the virtual environment later: `deactivate`.
+Launches the program under `pdb` for step-by-step debugging.
 
 ### Linting / static checks
 
@@ -257,18 +224,26 @@ package at the root of this repository: `mazegen-1.0.0-py3-none-any.whl` /
 
 ### How AI was used
 
-We used Claude (Anthropic) as a support assistant throughout this project, specifically for:
+We used Claude (Anthropic) as a debugging and code-review assistant throughout this project,
+specifically for:
 
-- **Understanding the project as a whole**: helping us get a clear picture of the subject's
-  requirements before starting, and how the different pieces (generation, solving, rendering,
-  configuration) fit together.
-- **Splitting roles between us**: helping us divide the work into a sensible split (generation/
-  solving vs. rendering/configuration/CLI) based on the scope of each part.
-- **Fixing a handful of `flake8` and `mypy --strict` issues**: a small number of linting and
-  strict type-checking errors that came up during the project-wide code-quality pass.
+- **Diagnosing a visual bug**: the solution path sometimes covered most of the maze, hiding the
+  "42" pattern. Claude helped trace this to the choice of generation algorithm (Recursive
+  Backtracker) rather than a logic error, by running controlled experiments comparing solution
+  path lengths across many random generations.
+- **Proposing and implementing the fix**: switching to Randomized Prim's Algorithm, including
+  fixing a connectivity regression this introduced (the "42" cells being wrongly treated as real
+  connected neighbors), and later simplifying that fix to avoid adding any new class methods or
+  attributes.
+- **Reviewing the config loader** against the subject's list of mandatory keys, which caught that
+  `PERFECT` was missing from the required-keys validation.
+- **Auditing docstring coverage** across all classes (`Cell`, `MazeGenerator`, `Config`,
+  `TerminalRenderer`) against PEP 257 and writing the missing ones.
+- **Drafting this README.md** and the `.gitignore` file.
 
-All AI-suggested changes were reviewed, tested, and understood by us before being committed.
-The core program logic, structure, and implementation are our own work.
+All AI-suggested changes were reviewed, tested (including automated connectivity/path-length
+checks across dozens of random mazes), and understood by us before being committed. The core
+program logic, structure, and initial implementation are our own work.
 
 ## Team and Project Management
 
@@ -324,7 +299,7 @@ instead of retrofitting it once the core logic already worked.
 ### Tools used
 
 - **Git / GitHub** for version control and collaboration.
-- **Claude (Anthropic)** as a project-understanding and code-quality assistant (see
+- **Claude (Anthropic)** as a debugging and code-review assistant (see
   [How AI was used](#how-ai-was-used) above).
 - **flake8** and **mypy** for linting and static type checking.
 - **pip / build** for packaging the reusable `mazegen` module.

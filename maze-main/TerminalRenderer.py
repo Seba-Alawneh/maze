@@ -42,15 +42,17 @@ class TerminalRenderer:
         color_wall = color
 
         # Top border
-        print(f"{color_wall}╔{RESET}" + f"{color_wall}═══╦{RESET}" * (width - 1) + f"{color_wall}═══╗{RESET}")
+        print(
+            f"{color_wall}╔{RESET}"
+            + f"{color_wall}═══╦{RESET}" * (width - 1)
+            + f"{color_wall}═══╗{RESET}"
+        )
 
         for y in range(height):
             line_cells = f"{color_wall}║{RESET}"
             line_walls = f"{color_wall}╠{RESET}"
-
             for x in range(width):
                 cell = self.grid[y][x]
-
                 if (x, y) == self.entry:
                     content = f"{YELLOW} ♛ {RESET}"   # Entry marker
                 elif (x, y) == self.exit:
@@ -61,19 +63,25 @@ class TerminalRenderer:
                     content = f"{GREEN} ⬢ {RESET}"     # Solution path
                 else:
                     content = "   "
-
                 line_cells += content
-
                 # East wall
                 line_cells += f"{color_wall}║{RESET}" if cell & 2 else " "
-
                 # South wall
-                line_walls += f"{color_wall}═══{RESET}" if cell & 4 else "   "
-                line_walls += f"{color_wall}╬{RESET}" if x < width - 1 else f"{color_wall}╣{RESET}"
-
+                line_walls += (
+                    f"{color_wall}═══{RESET}" if cell & 4 else "   "
+                )
+                line_walls += (
+                    f"{color_wall}╬{RESET}"
+                    if x < width - 1
+                    else f"{color_wall}╣{RESET}"
+                )
             print(line_cells)
             if y != height - 1:
                 print(line_walls)
 
         # Bottom border
-        print(f"{color_wall}╚{RESET}" + f"{color_wall}═══╩{RESET}" * (width - 1) + f"{color_wall}═══╝{RESET}")
+        print(
+            f"{color_wall}╚{RESET}"
+            + f"{color_wall}═══╩{RESET}" * (width - 1)
+            + f"{color_wall}═══╝{RESET}"
+        )

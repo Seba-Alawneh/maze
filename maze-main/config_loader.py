@@ -11,22 +11,26 @@ class Config:
         self.ENTRY: tuple[int, int] = (0, 0)
         self.EXIT: tuple[int, int] = (0, 0)
         self.OUTPUT_FILE: str = ""
-        self.PERFECT: bool = False
+        self.PERFECT: bool = True
         self.SEED: int | None = None
 
         self._load(filename)
         self.validate_data()
 
     @staticmethod
-    def check_split(parts: list[str], original_text: str, delimiter: str) -> None:
+    def check_split(
+        parts: list[str], original_text: str, delimiter: str
+    ) -> None:
         """Validate that a split operation produced exactly two parts."""
         if len(parts) != 2:
             raise ValueError(
-                f"Bad syntax in configuration. Missing '{delimiter}' in: '{original_text.strip()}'"
+                f"Bad syntax in configuration. Missing '{delimiter}' "
+                f"in: '{original_text.strip()}'"
             )
         if not parts[0].strip() or not parts[1].strip():
             raise ValueError(
-                f"Bad syntax in configuration. Missing value for key in: '{original_text.strip()}'"
+                f"Bad syntax in configuration. Missing value for key "
+                f"in: '{original_text.strip()}'"
             )
 
     def _load(self, filename: str) -> None:
@@ -48,7 +52,9 @@ class Config:
                     value = value.strip()
 
                     if key in seen_keys:
-                        raise ValueError(f"Duplicate key found in configuration: {key}")
+                        raise ValueError(
+                            f"Duplicate key found in configuration: {key}"
+                        )
                     seen_keys.add(key)
 
                     if key in ["WIDTH", "HEIGHT", "SEED"]:
@@ -61,7 +67,10 @@ class Config:
                             elif key == "SEED":
                                 self.SEED = numeric_value
                         except ValueError:
-                            raise ValueError(f"Invalid configuration: The value for {key} must be a number.")
+                            raise ValueError(
+                                f"Invalid configuration: The value for "
+                                f"{key} must be a number."
+                            )
 
                     elif key in ["ENTRY", "EXIT"]:
                         coords = value.split(",")
@@ -74,21 +83,40 @@ class Config:
                             elif key == "EXIT":
                                 self.EXIT = (x, y)
                         except ValueError:
-                            raise ValueError(f"Invalid configuration: Coordinates for {key} must be numbers.")
+                            raise ValueError(
+                                f"Invalid configuration: Coordinates for "
+                                f"{key} must be numbers."
+                            )
 
                     elif key == "OUTPUT_FILE":
                         self.OUTPUT_FILE = value
                     elif key == "PERFECT":
-                        self.PERFECT = value.lower() == "true"
+                        lower_value = value.lower().strip()
+                        if lower_value == "true":
+                            self.PERFECT = True
+                        elif lower_value == "false":
+                            self.PERFECT = False
+                        else:
+                            raise ValueError(
+                                f"Invalid value for PERFECT: '{value}'. "
+                                f"Expected 'true' or 'false'."
+                            )
 
             # Check for required keys
-            required_keys = ["WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT"]
+            required_keys = [
+                "WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT"
+            ]
             for req_key in required_keys:
                 if req_key not in seen_keys:
-                    raise ValueError(f"Error: '{req_key}' is missing from the configuration file.")
+                    raise ValueError(
+                        f"Error: '{req_key}' is missing from the "
+                        f"configuration file."
+                    )
 
         except FileNotFoundError:
-            raise ValueError(f"Error: The configuration file '{filename}' was not found.")
+            raise ValueError(
+                f"Error: The configuration file '{filename}' was not found."
+            )
 
     def validate_data(self) -> None:
         """Validate all configuration values."""
