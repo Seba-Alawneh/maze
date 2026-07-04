@@ -60,13 +60,46 @@ Once running, use the on-screen menu to:
 3. Rotate the maze wall colors
 4. Quit
 
-### Debugging
+### Installation using a virtual environment (venv)
+
+If you'd like to work inside a virtual environment (recommended, so you don't mix things up
+with your system-wide Python packages), follow these steps in order:
 
 ```bash
-make debug
+# 1. Clone the project and move into its folder
+git clone <this-repository-url>
+cd a-maze-ing
+
+# 2. Create the virtual environment
+python3 -m venv venv
+
+# 3. Activate the virtual environment
+source venv/bin/activate
+
+# 4. Upgrade pip inside the virtual environment
+pip install --upgrade pip
+
+# 5. Install the project and its dependencies (via pyproject.toml, not requirements.txt)
+pip install -e .
+
+# 6. (Optional) Check where you are and what's in the folder
+ls
+
+# 7. Run the style and type checks
+make lint
+
+# 8. Run the program
+make run
 ```
 
-Launches the program under `pdb` for step-by-step debugging.
+**Important notes:**
+
+- `cd a-maze-ing` must happen *before* creating or activating the virtual environment, not after.
+- The project has no `requirements.txt` file; dependencies are declared in `pyproject.toml`
+  (since the `mazegen` library is packaged as a pip package), so `pip install -e .` is the
+  correct command instead of `pip install -r requirements.txt`.
+- `pip install --upgrade pip` logically belongs *before* installing the project, not after.
+- To deactivate the virtual environment later: `deactivate`.
 
 ### Linting / static checks
 
@@ -224,28 +257,21 @@ package at the root of this repository: `mazegen-1.0.0-py3-none-any.whl` /
 
 ### How AI was used
 
-We used Claude (Anthropic) as a debugging and code-review assistant throughout this project,
-specifically for:
+We used Claude (Anthropic) as a support assistant throughout this project, specifically for:
 
-- **Diagnosing a visual bug**: the solution path sometimes covered most of the maze, hiding the
-  "42" pattern. Claude helped trace this to the choice of generation algorithm (Recursive
-  Backtracker) rather than a logic error, by running controlled experiments comparing solution
-  path lengths across many random generations.
-- **Proposing and implementing the fix**: switching to Randomized Prim's Algorithm, including
-  fixing a connectivity regression this introduced (the "42" cells being wrongly treated as real
-  connected neighbors), and later simplifying that fix to avoid adding any new class methods or
-  attributes.
-- **Reviewing the config loader** against the subject's list of mandatory keys, which caught that
-  `PERFECT` was missing from the required-keys validation.
-- **Auditing docstring coverage** across all classes (`Cell`, `MazeGenerator`, `Config`,
-  `TerminalRenderer`) against PEP 257 and writing the missing ones.
-- **Drafting this README.md** and the `.gitignore` file.
+- **Understanding the project as a whole**: helping us get a clear picture of the subject's
+  requirements before starting, and how the different pieces (generation, solving, rendering,
+  configuration) fit together.
+- **Splitting roles between us**: helping us divide the work into a sensible split (generation/
+  solving vs. rendering/configuration/CLI) based on the scope of each part.
+- **Fixing a handful of `flake8` and `mypy --strict` issues**: a small number of linting and
+  strict type-checking errors that came up during the project-wide code-quality pass.
 
-All AI-suggested changes were reviewed, tested (including automated connectivity/path-length
-checks across dozens of random mazes), and understood by us before being committed. The core
-program logic, structure, and initial implementation are our own work.
+All AI-suggested changes were reviewed, tested, and understood by us before being committed.
+The core program logic, structure, and implementation are our own work.
 
 ## Team and Project Management
+
 ### Roles
 
 Work was split by module, with a lot of cross-review and mutual debugging rather than
@@ -253,16 +279,22 @@ strictly separate silos — whoever finished their part first would jump in and 
 or fix the other's code, so the split below reflects primary ownership, not the only
 person who ever touched that file.
 
-- **salalawn**: Primary ownership of the core maze generation logic (`maze_generator.py`)
-  including the DFS algorithm and PERFECT/non-PERFECT maze variations, the configuration
-  management (`config_loader.py` and `config.txt`), and the visual output via the
-  terminal rendering engine (`TerminalRenderer.py`).
+- **habu-har**: packaging the reusable module as an installable pip package (`mazegen-*`,
+  `pyproject.toml`), the `Makefile` (install/run/debug/clean/lint targets), the BFS
+  `maze_solver.py`, the `.gitignore`, and the project-wide code-quality pass — adding
+  type hints (`typing` module) and getting the whole project to pass `mypy` cleanly,
+  writing the PEP 257 docstrings for every class, and auditing resource handling
+  (e.g. making sure file operations use `with` context managers instead of manual
+  open/close) to avoid leaks.
+- **salalawn**: the terminal rendering (`TerminalRenderer.py`), the configuration loader
+  (`config_loader.py`) and `config.txt`, and the interactive menu / terminal-size
+  handling in `a_maze_ing.py` (checking the window is large enough before drawing the
+  maze, and prompting the user to enlarge it otherwise).
 
-- **habu-har**: Packaging the reusable module as an installable pip package (`mazegen-*`,
-  `pyproject.toml`), the `Makefile` (install/run/debug/clean/lint targets), the main
-  execution script and interactive prompts (`a_maze_ing.py`), the BFS `maze_solver.py`,
-  and project-wide tasks including `.gitignore` and code-quality passes (type hints,
-  clean `mypy` execution, PEP 257 docstrings, and safe resource handling).
+The maze generation itself (`maze_generator.py`) — including the "42" pattern and the
+switch from a Recursive Backtracker to Randomized Prim's Algorithm to fix the
+long-solution-path bug — was debugged and rewritten together.
+
 ### Planning
 
 Our initial plan was to split the project cleanly down the middle: one of us owns
@@ -292,7 +324,7 @@ instead of retrofitting it once the core logic already worked.
 ### Tools used
 
 - **Git / GitHub** for version control and collaboration.
-- **Claude (Anthropic)** as a debugging and code-review assistant (see
+- **Claude (Anthropic)** as a project-understanding and code-quality assistant (see
   [How AI was used](#how-ai-was-used) above).
 - **flake8** and **mypy** for linting and static type checking.
 - **pip / build** for packaging the reusable `mazegen` module.
