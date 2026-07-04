@@ -72,6 +72,8 @@ class MazeGenerator:
             for dx in range(pattern_width):
                 if pattern[dy][dx] == '1':
                     target_cell = self.grid[start_y + dy][start_x + dx]
+                    if (target_cell.x, target_cell.y) == self.entry or (target_cell.x, target_cell.y) == self.exit:
+                        raise ValueError("Error: '42' pattern overlaps with ENTRY or EXIT points!")
                     target_cell.visited = True
 
     def grid_gen(self) -> list[list[Cell]]:

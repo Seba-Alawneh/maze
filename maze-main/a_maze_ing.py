@@ -37,8 +37,8 @@ def main() -> None:
         config = Config(sys.argv[1])
 
         # Enforce exact size 20x15
-        if config.WIDTH != 20 or config.HEIGHT != 15:
-            raise ValueError("Maze size must be exactly WIDTH=20, HEIGHT=15")
+        if config.WIDTH > 20 or config.HEIGHT >15:
+            raise ValueError("Maze size must be more than WIDTH=20, HEIGHT=15")
 
         gen, int_grid, solution_coord, solution = build_maze(config)
 
