@@ -92,8 +92,8 @@ class Config:
 
     def validate_data(self) -> None:
         """Validate all configuration values."""
-        if self.WIDTH <= 0 or self.HEIGHT <= 0:
-            raise ValueError("WIDTH and HEIGHT must be greater than 0.")
+        if self.WIDTH <= 1 or self.HEIGHT <= 1:
+            raise ValueError("WIDTH and HEIGHT must be greater than 1.")
 
         if self.ENTRY == self.EXIT:
             raise ValueError("ENTRY and EXIT points must be different.")
